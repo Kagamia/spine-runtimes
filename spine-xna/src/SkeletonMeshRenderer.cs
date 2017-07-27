@@ -47,7 +47,6 @@ namespace Spine {
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
 		int[] quadTriangles = { 0, 1, 2, 1, 3, 2 };
-		BlendState defaultBlendState;
 
 		BasicEffect effect;
 		public BasicEffect Effect { get { return effect; } set { effect = value; } }
@@ -55,7 +54,14 @@ namespace Spine {
 		private bool premultipliedAlpha;
 		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
 
-		public SkeletonMeshRenderer (GraphicsDevice device) {
+        private BlendState blendStateNormal;
+        private BlendState blendStateNormalPMA;
+        private BlendState blendStateAdditive;
+        private BlendState blendStateAdditivePMA;
+        private BlendState blendStateMultiply;
+        private BlendState blendStateScreen;
+
+        public SkeletonMeshRenderer (GraphicsDevice device) {
 			this.device = device;
 
 			batcher = new MeshBatcher();
@@ -69,14 +75,38 @@ namespace Spine {
 			rasterizerState = new RasterizerState();
 			rasterizerState.CullMode = CullMode.None;
 
-			Bone.yDown = true;
+            blendStateNormal = this.device.GraphicsProfile == GraphicsProfile.HiDef ?
+                Util.CreateBlend_NonPremultipled_Hidef() : BlendState.NonPremultiplied;
+            blendStateNormalPMA = BlendState.AlphaBlend;
+            blendStateAdditive = BlendState.Additive;
+            blendStateAdditivePMA = new BlendState()
+            {
+                ColorSourceBlend = Blend.One,
+                AlphaSourceBlend = Blend.One,
+                ColorDestinationBlend = Blend.One,
+                AlphaDestinationBlend = Blend.One
+            };
+            blendStateMultiply = new BlendState()
+            {
+                ColorSourceBlend = Blend.DestinationColor,
+                AlphaSourceBlend = Blend.DestinationColor,
+                ColorDestinationBlend = Blend.InverseSourceAlpha,
+                AlphaDestinationBlend = Blend.InverseSourceAlpha
+            };
+            blendStateScreen = new BlendState()
+            {
+                ColorSourceBlend = Blend.One,
+                AlphaSourceBlend = Blend.One,
+                ColorDestinationBlend = Blend.InverseSourceColor,
+                AlphaDestinationBlend = Blend.InverseSourceColor
+            };
+
+            Bone.yDown = true;
 		}
 
 		public void Begin () {
-			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
-
 			device.RasterizerState = rasterizerState;
-			device.BlendState = defaultBlendState;
+            device.BlendState = GetState(BlendMode.normal);
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
 		}
@@ -90,18 +120,20 @@ namespace Spine {
 
 		public void Draw (Skeleton skeleton) {
 			float[] vertices = this.vertices;
-			List<Slot> drawOrder = skeleton.DrawOrder;
+			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+				Slot slot = drawOrder.Items[i];
 				Attachment attachment = slot.Attachment;
-				if (attachment is RegionAttachment) {
+                BlendState blend = GetState(slot.Data.BlendMode);
+                if (device.BlendState != blend)
+                {
+                    End();
+                    device.BlendState = blend;
+                }
+
+                if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
-					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
-					if (device.BlendState != blend) {
-						End();
-						device.BlendState = blend;
-					}
 
 					MeshItem item = batcher.NextItem(4, 6);
 					item.triangles = quadTriangles;
@@ -228,5 +260,17 @@ namespace Spine {
 				}
 			}
 		}
+
+        private BlendState GetState(BlendMode blendMode)
+        {
+            switch (blendMode)
+            {
+                default:
+                case BlendMode.normal: return this.PremultipliedAlpha ? this.blendStateNormalPMA : this.blendStateNormal;
+                case BlendMode.additive: return this.PremultipliedAlpha ? this.blendStateAdditivePMA : this.blendStateAdditive;
+                case BlendMode.multiply: return this.blendStateMultiply;
+                case BlendMode.screen: return this.blendStateScreen;
+            }
+        }
 	}
 }

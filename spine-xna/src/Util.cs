@@ -41,7 +41,8 @@ using Windows.Storage;
 
 namespace Spine {
 
-	static public class Util {
+    static public class Util
+    {
 #if WINDOWS_STOREAPP
 		private static async Task<Texture2D> LoadFile(GraphicsDevice device, String path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
@@ -57,26 +58,42 @@ namespace Spine {
 			return LoadFile(device, path).Result;
 		}
 #else
-		static public Texture2D LoadTexture (GraphicsDevice device, String path) {
+        static public Texture2D LoadTexture(GraphicsDevice device, String path)
+        {
 
 #if WINDOWS_PHONE
             Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
             using (Stream input = stream)
             {
 #else
-            using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+            using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
 #endif
-				try {
-					return Util.LoadTexture(device, input);
-				} catch (Exception ex) {
-					throw new Exception("Error reading texture file: " + path, ex);
-				}
-			}
-		}
+                try
+                {
+                    return Util.LoadTexture(device, input);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error reading texture file: " + path, ex);
+                }
+            }
+        }
 #endif
 
-		static public Texture2D LoadTexture (GraphicsDevice device, Stream input) {
-			return Texture2D.FromStream(device, input);
-		}
-	}
+        static public Texture2D LoadTexture(GraphicsDevice device, Stream input)
+        {
+            return Texture2D.FromStream(device, input);
+        }
+
+        static public BlendState CreateBlend_NonPremultipled_Hidef() => new BlendState()
+        {
+            AlphaSourceBlend = Blend.One,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+        };
+    }
 }

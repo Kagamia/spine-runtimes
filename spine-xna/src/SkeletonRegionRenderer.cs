@@ -49,7 +49,9 @@ namespace Spine {
 		private bool premultipliedAlpha;
 		public bool PremultipliedAlpha { get { return premultipliedAlpha; } set { premultipliedAlpha = value; } }
 
-		public SkeletonRegionRenderer (GraphicsDevice device) {
+        private BlendState alphaBlendState;
+
+        public SkeletonRegionRenderer (GraphicsDevice device) {
 			this.device = device;
 
 			batcher = new RegionBatcher();
@@ -63,13 +65,17 @@ namespace Spine {
 			rasterizerState = new RasterizerState();
 			rasterizerState.CullMode = CullMode.None;
 
-			Bone.yDown = true;
+            alphaBlendState = this.device.GraphicsProfile == GraphicsProfile.HiDef ?
+               Util.CreateBlend_NonPremultipled_Hidef() : BlendState.NonPremultiplied;
+
+
+            Bone.yDown = true;
 		}
 
 		public void Begin () {
-			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
+            defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : this.alphaBlendState;
 
-			device.RasterizerState = rasterizerState;
+            device.RasterizerState = rasterizerState;
 			device.BlendState = defaultBlendState;
 
 			effect.Projection = Matrix.CreateOrthographicOffCenter(0, device.Viewport.Width, device.Viewport.Height, 0, 1, 0);
@@ -83,10 +89,10 @@ namespace Spine {
 		}
 
 		public void Draw (Skeleton skeleton) {
-			List<Slot> drawOrder = skeleton.DrawOrder;
+			ExposedList<Slot> drawOrder = skeleton.DrawOrder;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
-				Slot slot = drawOrder[i];
+				Slot slot = drawOrder.Items[i];
 				RegionAttachment regionAttachment = slot.Attachment as RegionAttachment;
 				if (regionAttachment != null) {
 					BlendState blend = slot.Data.BlendMode == BlendMode.additive ? BlendState.Additive : defaultBlendState;
