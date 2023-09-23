@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641">
@@ -302,5 +302,94 @@
     <None Include="..\..\spine-csharp\src\Attachments\VertexAttachment.cs.meta">
       <Link>spine-csharp\Attachments\VertexAttachment.cs.meta</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\spine-csharp\src\v2\Animation.cs">
+      <Link>spine-csharp\v2\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\AnimationState.cs">
+      <Link>spine-csharp\v2\AnimationState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\AnimationStateData.cs">
+      <Link>spine-csharp\v2\AnimationStateData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Atlas.cs">
+      <Link>spine-csharp\v2\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\BlendMode.cs">
+      <Link>spine-csharp\v2\BlendMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Bone.cs">
+      <Link>spine-csharp\v2\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\BoneData.cs">
+      <Link>spine-csharp\v2\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Event.cs">
+      <Link>spine-csharp\v2\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\EventData.cs">
+      <Link>spine-csharp\v2\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\ExposedList.cs">
+      <Link>spine-csharp\v2\ExposedList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\IkConstraint.cs">
+      <Link>spine-csharp\v2\IkConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\IkConstraintData.cs">
+      <Link>spine-csharp\v2\IkConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Json.cs">
+      <Link>spine-csharp\v2\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Skeleton.cs">
+      <Link>spine-csharp\v2\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\SkeletonBinary.cs">
+      <Link>spine-csharp\v2\SkeletonBinary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\SkeletonBounds.cs">
+      <Link>spine-csharp\v2\SkeletonBounds.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\SkeletonData.cs">
+      <Link>spine-csharp\v2\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\SkeletonJson.cs">
+      <Link>spine-csharp\v2\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Skin.cs">
+      <Link>spine-csharp\v2\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Slot.cs">
+      <Link>spine-csharp\v2\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\SlotData.cs">
+      <Link>spine-csharp\v2\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\AtlasAttachmentLoader.cs">
+      <Link>spine-csharp\v2\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\Attachment.cs">
+      <Link>spine-csharp\v2\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\AttachmentLoader.cs">
+      <Link>spine-csharp\v2\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\AttachmentType.cs">
+      <Link>spine-csharp\v2\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\BoundingBoxAttachment.cs">
+      <Link>spine-csharp\v2\Attachments\BoundingBoxAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\MeshAttachment.cs">
+      <Link>spine-csharp\v2\Attachments\MeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\RegionAttachment.cs">
+      <Link>spine-csharp\v2\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\v2\Attachments\SkinnedMeshAttachment.cs">
+      <Link>spine-csharp\v2\Attachments\SkinnedMeshAttachment.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -34,7 +34,7 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Draws region and mesh attachments.</summary>
-	public class SkeletonRenderer {
+	public partial class SkeletonRenderer {
 		private const int TL = 0;
 		private const int TR = 1;
 		private const int BL = 2;
@@ -82,7 +82,9 @@ namespace Spine {
 			rasterizerState.CullMode = CullMode.None;
 
 			Bone.yDown = true;
-		}
+
+			this.v2ctor();
+        }
 
 		public void Begin () {
 			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;

@@ -75,5 +75,15 @@ namespace Spine {
 		static public Texture2D LoadTexture (GraphicsDevice device, Stream input) {
 			return Texture2D.FromStream(device, input);
 		}
-	}
+
+        static public BlendState CreateBlend_NonPremultipled_Hidef() => new BlendState()
+        {
+            AlphaSourceBlend = Blend.One,
+            AlphaDestinationBlend = Blend.InverseSourceAlpha,
+            AlphaBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.SourceAlpha,
+            ColorDestinationBlend = Blend.InverseSourceAlpha,
+            ColorBlendFunction = BlendFunction.Add,
+        };
+    }
 }
