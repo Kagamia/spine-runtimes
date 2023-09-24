@@ -29,6 +29,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -97,7 +98,7 @@ namespace Spine
                 if (attachment is V2.RegionAttachment regionAttachment)
                 {
                     MeshItem item = batcher.NextItem(4, 6);
-                    item.triangles = quadTriangles;
+                    Array.Copy(quadTriangles, item.triangles, quadTriangles.Length);
                     VertexPositionColorTextureColor[] itemVertices = item.vertices;
 
                     V2.AtlasRegion region = (V2.AtlasRegion)regionAttachment.RendererObject;
@@ -160,8 +161,8 @@ namespace Spine
                     mesh.ComputeWorldVertices(slot, vertices);
 
                     int[] triangles = mesh.Triangles;
-                    MeshItem item = batcher.NextItem(vertexCount, triangles.Length);
-                    item.triangles = triangles;
+                    MeshItem item = batcher.NextItem(vertexCount >> 1, triangles.Length);
+                    Array.Copy(triangles, item.triangles, triangles.Length);
 
                     V2.AtlasRegion region = (V2.AtlasRegion)mesh.RendererObject;
                     item.texture = (Texture2D)region.page.rendererObject;
@@ -203,8 +204,8 @@ namespace Spine
                     skinnedMesh.ComputeWorldVertices(slot, vertices);
 
                     int[] triangles = skinnedMesh.Triangles;
-                    MeshItem item = batcher.NextItem(vertexCount, triangles.Length);
-                    item.triangles = triangles;
+                    MeshItem item = batcher.NextItem(vertexCount >> 1, triangles.Length);
+                    Array.Copy(triangles, item.triangles, triangles.Length);
 
                     V2.AtlasRegion region = (V2.AtlasRegion)skinnedMesh.RendererObject;
                     item.texture = (Texture2D)region.page.rendererObject;
