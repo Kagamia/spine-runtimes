@@ -43,6 +43,7 @@ namespace Spine
         private BlendState blendStateAdditivePMA;
         private BlendState blendStateMultiply;
         private BlendState blendStateScreen;
+        private int[] quadTrianglesV2 = { 0, 1, 2, 1, 3, 2 };
 
         private void v2ctor()
         {
@@ -98,7 +99,7 @@ namespace Spine
                 if (attachment is V2.RegionAttachment regionAttachment)
                 {
                     MeshItem item = batcher.NextItem(4, 6);
-                    Array.Copy(quadTriangles, item.triangles, quadTriangles.Length);
+                    Array.Copy(quadTrianglesV2, item.triangles, quadTrianglesV2.Length);
                     VertexPositionColorTextureColor[] itemVertices = item.vertices;
 
                     V2.AtlasRegion region = (V2.AtlasRegion)regionAttachment.RendererObject;
