@@ -34,7 +34,7 @@ using System.Collections.Generic;
 
 namespace Spine {
 	/// <summary>Draws region and mesh attachments.</summary>
-	public partial class SkeletonRenderer {
+	public partial class SkeletonRenderer : IDisposable {
 		private const int TL = 0;
 		private const int TR = 1;
 		private const int BL = 2;
@@ -47,6 +47,7 @@ namespace Spine {
 		RasterizerState rasterizerState;
 		float[] vertices = new float[8];
 		int[] quadTriangles = { 0, 1, 2, 2, 3, 0 };
+		BasicEffect defaultEffect;
 		BlendState defaultBlendState;
 
 		Effect effect;
@@ -64,7 +65,9 @@ namespace Spine {
 
 		/// <summary>A Z position offset added at each vertex.</summary>
 		private float z = 0.0f;
-		public float Z { get { return z; } set { z = value; } }
+        private bool isDisposed;
+
+        public float Z { get { return z; } set { z = value; } }
 
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
@@ -77,11 +80,12 @@ namespace Spine {
 			basicEffect.TextureEnabled = true;
 			basicEffect.VertexColorEnabled = true;
 			effect = basicEffect;
+			this.defaultEffect = basicEffect;
 
 			rasterizerState = new RasterizerState();
 			rasterizerState.CullMode = CullMode.None;
 
-			Bone.yDown = true;
+            Bone.yDown = true;
 
 			this.v2ctor();
         }
@@ -116,6 +120,7 @@ namespace Spine {
 
 				float attachmentColorR, attachmentColorG, attachmentColorB, attachmentColorA;
 				object textureObject = null;
+				bool pma = this.premultipliedAlpha;
 				int verticesCount = 0;
 				float[] vertices = this.vertices;
 				int indicesCount = 0;
@@ -132,7 +137,8 @@ namespace Spine {
 					uvs = regionAttachment.UVs;
 					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
 					textureObject = region.page.rendererObject;
-				} else if (attachment is MeshAttachment) {
+                    pma |= region.page.pma;
+                } else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
 					int vertexCount = mesh.WorldVerticesLength;
@@ -144,7 +150,8 @@ namespace Spine {
 					uvs = mesh.UVs;
 					AtlasRegion region = (AtlasRegion)mesh.Region;
 					textureObject = region.page.rendererObject;
-				} else if (attachment is ClippingAttachment) {
+                    pma |= region.page.pma;
+                } else if (attachment is ClippingAttachment) {
 					ClippingAttachment clip = (ClippingAttachment)attachment;
 					clipper.ClipStart(slot, clip);
 					continue;
@@ -152,16 +159,25 @@ namespace Spine {
 					continue;
 				}
 
-				// set blend state
-				BlendState blend = slot.Data.BlendMode == BlendMode.Additive ? BlendState.Additive : defaultBlendState;
+                // set blend state
+                BlendState blend;
+				switch (slot.Data.BlendMode)
+				{
+					case BlendMode.Normal: blend = pma ? this.blendStateNormalPMA : this.blendStateNormal; break;
+                    case BlendMode.Additive: blend = pma ? this.blendStateAdditivePMA : this.blendStateAdditive; break;
+					case BlendMode.Multiply: blend = this.blendStateMultiply; break;
+					case BlendMode.Screen: blend = this.blendStateScreen; break;
+					default: 
+						goto case BlendMode.Normal;
+                }
 				if (device.BlendState != blend) {
-					//End();
-					//device.BlendState = blend;
+					End();
+					device.BlendState = blend;
 				}
 
 				// calculate color
 				float a = skeletonA * slot.A * attachmentColorA;
-				if (premultipliedAlpha) {
+				if (pma) {
 					color = new Color(
 							skeletonR * slot.R * attachmentColorR * a,
 							skeletonG * slot.G * attachmentColorG * a,
@@ -175,13 +191,13 @@ namespace Spine {
 
 				Color darkColor = new Color();
 				if (slot.HasSecondColor) {
-					if (premultipliedAlpha) {
+					if (pma) {
 						darkColor = new Color(slot.R2 * a, slot.G2 * a, slot.B2 * a);
 					} else {
 						darkColor = new Color(slot.R2 * a, slot.G2 * a, slot.B2 * a);
 					}
 				}
-				darkColor.A = premultipliedAlpha ? (byte)255 : (byte)0;
+				darkColor.A = pma ? (byte)255 : (byte)0;
 
 				// clip
 				if (clipper.IsClipping) {
@@ -224,5 +240,33 @@ namespace Spine {
 			clipper.ClipEnd();
 			if (VertexEffect != null) VertexEffect.End();
 		}
-	}
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                if (disposing)
+                {
+					this.blendStateAdditivePMA?.Dispose();
+					this.blendStateMultiply?.Dispose();
+					this.blendStateScreen?.Dispose();
+					this.defaultEffect?.Dispose();
+					this.rasterizerState?.Dispose();
+                }
+
+                this.isDisposed = true;
+            }
+        }
+
+		~SkeletonRenderer()
+		{
+		    this.Dispose(false);
+		}
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+    }
 }
